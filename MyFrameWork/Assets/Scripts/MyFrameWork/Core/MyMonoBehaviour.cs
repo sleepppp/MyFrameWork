@@ -6,7 +6,7 @@ namespace MyFrameWork
 {
     public class MyMonoBehaviour : MonoBehaviour
     {
-        readonly HashSet<UpdateManager.IHandle> _handleList = new HashSet<UpdateManager.IHandle>();
+        readonly List<UpdateManager.IHandle> _handleList = new List<UpdateManager.IHandle>();
 
         protected virtual void OnDestroy()
         {
@@ -41,5 +41,22 @@ namespace MyFrameWork
             }
             _handleList.Clear();
         }
+
+        /// <summary>
+        /// check handle state and remove
+        /// </summary>
+        protected void RefreshHandles()
+        {
+            for (int i = 0; i < _handleList.Count; ++i)
+            {
+                if(_handleList[i].State == UpdateManager.UpdateState.None ||
+                    _handleList[i].IsValid() == false)
+                {
+                    _handleList.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
     }
 }

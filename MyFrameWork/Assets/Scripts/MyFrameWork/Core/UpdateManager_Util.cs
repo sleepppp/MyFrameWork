@@ -12,26 +12,43 @@ namespace MyFrameWork
             None = 0,
             Update = 1,
             WaitForSeconds = 2,
+            WaitUntil = 3,
         }
 
         public interface IHandle
         {
+            /// <summary>
+            /// Handle UUID
+            /// </summary>
             public int ID { get; }
+            /// <summary>
+            /// You Can Check Enumerator State by this property
+            /// </summary>
             public UpdateState State { get; }
+            /// <summary>
+            /// Plz don't use this func in your code. It work correctly only in updateManager;
+            /// </summary>
             public void ChangeState(UpdateState state);
+            /// <summary>
+            /// You Can check Enemerator is working by this func
+            /// </summary>
             public bool IsValid();
         }
 
         struct Handle : IHandle,IEquatable<Handle>
         {
             public static Handle Null = new Handle(0);
+            public static IHandle CreateHandle(IEnumerator enumerator)
+            {
+                return new Handle(enumerator);
+            }
 
             public int ID { get; private set; }
             public UpdateState State { get; private set; }
-            public Handle(IEnumerator enumerator)
+            Handle(IEnumerator enumerator)
                 : this(enumerator.GetHashCode()) { }
 
-            public Handle(int id)
+            Handle(int id)
             {
                 ID = id;
                 State = UpdateState.Update;
@@ -67,25 +84,30 @@ namespace MyFrameWork
             }
         }
 
-        public interface IUpdateBase
+        interface IRequestInfo
         {
             public IEnumerator Enumerator { get; }
             public IHandle Handle { get; }
             public void Init(IHandle handle, IEnumerator enumerator);
         }
 
-        public interface IUpdater : IUpdateBase
+        interface IUpdater : IRequestInfo
         {
             public bool MoveNext();
             public object Current { get; }
         }
 
-        public struct Updater : IUpdater
+        struct Updater : IUpdater
         {
+            public static IUpdater CreateUpdater(IHandle handle, IEnumerator enumerator)
+            {
+                return new Updater(handle, enumerator);
+            }
+
             public IEnumerator Enumerator { get; private set; }
             public IHandle Handle { get; private set; }
             public object Current { get { return Enumerator.Current; } }
-            public Updater(IHandle handle, IEnumerator enumerator)
+            Updater(IHandle handle, IEnumerator enumerator)
             {
                 Handle = handle;
                 Enumerator = enumerator;
@@ -102,8 +124,8 @@ namespace MyFrameWork
             }
         }
 
-        public interface IWaitUptate : IUpdateBase { }
-        public interface IWaitCheckInUpdate : IWaitUptate
+        interface IWaitUpdate : IRequestInfo { }
+        interface IWaitCheckInUpdate : IWaitUpdate
         {
             public bool IsFinishedWait();
         }
@@ -134,5 +156,40 @@ namespace MyFrameWork
                 return Time.time - StartTime >= WaitTime;
             }
         }
+
+        public struct WaitUntil : IWaitCheckInUpdate
+        {
+            public IEnumerator Enumerator { get; private set; }
+            public IHandle Handle { get; private set; }
+            readonly Func<bool> _waitFunc;
+            public WaitUntil(Func<bool> waitFunc)
+            {
+#if UNITY_EDITOR
+                if(waitFunc == null)
+                {
+                    throw new System.Exception("Func<bool> is Null");
+                }
+#endif
+                _waitFunc = waitFunc;
+                Enumerator = null;
+                Handle = null;
+            }
+
+            public void Init(IHandle handle, IEnumerator enumerator)
+            {
+                Enumerator = enumerator;
+                Handle = handle;
+            }
+
+            public bool IsFinishedWait()
+            {
+                return _waitFunc();
+            }
+        }
+
+        //todo
+        //public struct WaitForFixedUpdate : IWaitUpdate
+        //todo
+        //public struct WaitEndOfFrame : IWaitUpdate
     }
 }

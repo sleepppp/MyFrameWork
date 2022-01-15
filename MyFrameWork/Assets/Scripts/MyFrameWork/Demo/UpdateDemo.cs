@@ -9,6 +9,7 @@ namespace MyFrameWork
     {
         Handle _handle = null;
         public bool _isHandleValid = true;
+        public UpdateManager.UpdateState _handleState;
         void Start()
         {
             _handle = StartUpdate(UpdateTest());
@@ -21,16 +22,21 @@ namespace MyFrameWork
                 StopUpdate(_handle);
             }
             _isHandleValid = _handle.IsValid();
+            _handleState = _handle.State;
         }
 
         IEnumerator UpdateTest()
         {
             //while(true)
             {
-                yield return new UpdateManager.WaitForSeconds(1f);
+                yield return new UpdateManager.WaitForSeconds(3f);
                 Debug.Log("UpdateTest");
-                yield return new UpdateManager.WaitForSeconds(1f);
-                Debug.Log("UpdateTest");
+
+                while (true)
+                {
+                    yield return null;
+                    Debug.Log("UpdateTest");
+                }
             }
         }
     }
