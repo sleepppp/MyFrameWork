@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyFrameWork
+namespace MyFrameWork.Demo
 {
     using Handle = UpdateManager.IHandle;
     public class UpdateDemo : MyMonoBehaviour
