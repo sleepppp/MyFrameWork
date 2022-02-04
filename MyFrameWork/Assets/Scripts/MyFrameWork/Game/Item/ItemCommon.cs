@@ -5,6 +5,8 @@ namespace MyFrameWork.Game
     {
         None = 0,
 
-        Healkit = 1
+        //todo type
     }
+
+
 }
