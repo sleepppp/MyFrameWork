@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: f44101f753dd0d44eba9963dd370be80
+  m_SerializeEntries:
+  - m_GUID: e48bde2c779aef84d88f0f803841ec4f
+    m_Address: Assets/Data/Json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e46f078991330e24db728c48ed913ec9
+    m_Address: Assets/Data/Etc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6cdc70b358967f147a3d25ba81ddd925
+    m_Address: Assets/Deploy/Prefabs/Terrain/WorldMapTest
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 8e32fe1398bf198499960698e7f442d1, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 3c56a9f6a121fd74980e705a9df1b9c6, type: 2}
+    - {fileID: 11400000, guid: 61ac44a752043864fa216588eab9c5a8, type: 2}
