@@ -60,7 +60,7 @@ namespace JustAssets.TerrainUtility
             return string.IsNullOrEmpty(setHelpString);
         }
 
-        public void Split(bool doSplitTrees = true, PowerOf2Squared targetPiecesPerAxis = PowerOf2Squared._2x2)
+        public void Split(TerrainUtility.SaveInfo saveInfo, bool doSplitTrees = true, PowerOf2Squared targetPiecesPerAxis = PowerOf2Squared._2x2)
         {
             _doSplitTrees = doSplitTrees;
             _targetPiecesPerAxis = targetPiecesPerAxis;
@@ -79,7 +79,7 @@ namespace JustAssets.TerrainUtility
             {
                 Terrain sourceTerrain = Selection[parentTerrainIndex];
                 EditorUtility.DisplayProgressBar("Split terrain", "Process " + parentTerrainIndex, (float) parentTerrainIndex / Selection.Length);
-                SplitTerrainTile(piecesPerAxis, sourceTerrain);
+                SplitTerrainTile(piecesPerAxis, sourceTerrain,saveInfo);
             }
 
             EditorUtility.ClearProgressBar();
@@ -269,10 +269,14 @@ namespace JustAssets.TerrainUtility
             targetTerrainData.SetHeights(0, 0, pieceHeight);
         }
 
-        private void SplitTerrainTile(int piecesPerAxis, Terrain sourceTerrain)
+        private void SplitTerrainTile(int piecesPerAxis, Terrain sourceTerrain, TerrainUtility.SaveInfo saveInfo)
         {
+            string prefabFolderPath = AssetDatabase.GetAssetPath(saveInfo.PrefabFolder) + "/";
+            GameObject gridPrefab = AssetDatabase.LoadAssetAtPath("Assets/Deploy/Prefabs/Terrain/Grid.prefab",typeof(GameObject)) as GameObject;
+
             TerrainData sourceTerrainData = sourceTerrain.terrainData;
             var terrains = new Terrain[piecesPerAxis * piecesPerAxis];
+
 
             //Split terrain 
             for (var sliceIndex = 0; sliceIndex < terrains.Length; sliceIndex++)
@@ -285,7 +289,8 @@ namespace JustAssets.TerrainUtility
                 Terrain targetTerrain = terrains[sliceIndex] = terrainGameObject.GetComponent<Terrain>();
                 targetTerrain.terrainData = targetTerrainData;
 
-                AssetDatabase.CreateAsset(targetTerrainData, "Assets/" + targetTerrain.name + ".asset");
+                AssetDatabase.CreateAsset(targetTerrainData, prefabFolderPath + terrainGameObject.name + ".asset");
+                //AssetDatabase.CreateAsset(terrainGameObject, prefabFolderPath + terrainGameObject.name + ".prefab");
 
                 CopyPrototypes(targetTerrainData, sourceTerrainData);
                 CopyTerrainProperties(sourceTerrain, targetTerrain, piecesPerAxis);
@@ -293,12 +298,21 @@ namespace JustAssets.TerrainUtility
                 SplitHeightMap(targetTerrainData, piecesPerAxis, sliceIndex, sourceTerrainData);
                 SplitControlTexture(targetTerrainData, piecesPerAxis, sliceIndex, sourceTerrainData);
                 SplitDetailMap(targetTerrainData, piecesPerAxis, sliceIndex, sourceTerrainData);
+                GameObject.Instantiate(gridPrefab, terrainGameObject.transform);
+
+                PrefabUtility.SaveAsPrefabAsset(terrainGameObject, prefabFolderPath + terrainGameObject.name + ".prefab");
+
 
                 AssetDatabase.SaveAssets();
             }
 
             SplitTrees(piecesPerAxis, terrains, sourceTerrain);
             AssetDatabase.SaveAssets();
+
+            foreach(var terrain in terrains)
+            {
+                GameObject.DestroyImmediate(terrain.gameObject);
+            }
         }
 
         private void SplitTrees(int terraPieces, Terrain[] tiles, Terrain sourceTerrain)

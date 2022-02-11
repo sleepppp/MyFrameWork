@@ -28,6 +28,13 @@ namespace JustAssets.TerrainUtility
             public object[] Params { get; }
         }
 
+        public class SaveInfo
+        {
+            public string TerrainName;
+            public UnityEngine.Object PrefabFolder;
+            public UnityEngine.Object DataSaveFolder;
+        }
+
         public enum Operation
         {
             None,
@@ -51,6 +58,10 @@ namespace JustAssets.TerrainUtility
         private bool _execute;
 
         private Dictionary<Operation, Option> _options;
+
+        private UnityEngine.Object _prefabSaveFolder;
+        private UnityEngine.Object _dataSaveFolder;
+        private string _terrainName;
 
         [MenuItem("Tools/Terrain/Terrain Utility")]
         public static void ShowWindow()
@@ -132,6 +143,30 @@ namespace JustAssets.TerrainUtility
                         i++;
                     }
                 }
+
+                //=========================================================================================================================================
+                //Custom
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.LabelField("Terrain Name", EditorStyles.boldLabel);
+                    _terrainName = EditorGUILayout.TextField(_terrainName);
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.LabelField("Prefab Save Folder", EditorStyles.boldLabel);
+                    _prefabSaveFolder = EditorGUILayout.ObjectField(_prefabSaveFolder, typeof(UnityEngine.Object), false);
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.LabelField("DataFile Save Folder", EditorStyles.boldLabel);
+                    _dataSaveFolder = EditorGUILayout.ObjectField(_dataSaveFolder, typeof(UnityEngine.Object), false);
+                }
+                EditorGUILayout.EndHorizontal();
+                //=============================================================================================================================================
+
+
                 EditorGUILayout.EndScrollView();
 
                 EditorGUILayout.BeginHorizontal(GUILayout.Height(20));
@@ -146,6 +181,7 @@ namespace JustAssets.TerrainUtility
                     GUI.enabled = true;
                 }
                 EditorGUILayout.EndHorizontal();
+
             }
             else
             {
@@ -164,7 +200,14 @@ namespace JustAssets.TerrainUtility
             switch (_operation)
             {
                 case Operation.SplitTerrain:
-                    ((SplitTerrain)option.Handler).Split((bool) option.Params[0], (SplitTerrain.PowerOf2Squared) option.Params[1]);
+                    SaveInfo saveInfo = new SaveInfo()
+                    {
+                        TerrainName = _terrainName,
+                        PrefabFolder = _prefabSaveFolder,
+                        DataSaveFolder = _dataSaveFolder
+                    };
+
+                    ((SplitTerrain)option.Handler).Split(saveInfo,(bool) option.Params[0], (SplitTerrain.PowerOf2Squared) option.Params[1]);
                     break;
                 case Operation.MergeTerrain:
                     ((MergeTerrain)_options[Operation.MergeTerrain].Handler).Merge();
