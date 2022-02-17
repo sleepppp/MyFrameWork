@@ -40,5 +40,33 @@ namespace MyFramework
 
             return result;
         }
+
+        public static GameObject CreateGridObject(float size)
+        {
+            GameObject newObject = new GameObject("Grid");
+            MeshFilter meshFilter = newObject.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = newObject.AddComponent<MeshRenderer>();
+            Material material = new Material(Shader.Find("Unlit/Grid"));
+            GridRenderer renderer = newObject.AddComponent<GridRenderer>();
+
+            meshFilter.mesh = CreateGridMesh(size);
+            meshRenderer.sharedMaterial = material;
+            renderer.MeshRenderer = meshRenderer;
+            renderer.MeshFilter = meshFilter;
+            renderer.Material = material;
+
+            float defaultSize = 10f;
+
+            float gridScale = size / defaultSize;
+
+            renderer.SetMainColor(Color.white);
+            renderer.SetSecondaryColor(Color.white);
+            renderer.SetScale(1f);
+            renderer.SetGraduationScaleX(gridScale);
+            renderer.SetGraduationScaleY(gridScale);
+            renderer.SetThickness(0.002f);
+
+            return newObject;
+        }
     }
 }

@@ -29,10 +29,10 @@ namespace MyFramework
 
         }
 
-        public static CellGroupIndex LocationToCellGroupIndex(Vector3 location)
+        public static CellGroupIndex LocationToCellGroupIndex(Vector3 location,int cellCount = CellGroup.DefaultCellCount)
         {
-            int indexX = (int)(location.x / CellGroup.GetSize());
-            int indexY = (int)(location.z / CellGroup.GetSize());
+            int indexX = (int)(location.x / CellGroup.GetSize(cellCount));
+            int indexY = (int)(location.z / CellGroup.GetSize(cellCount));
             return new CellGroupIndex(indexX, indexY);
         }
     }

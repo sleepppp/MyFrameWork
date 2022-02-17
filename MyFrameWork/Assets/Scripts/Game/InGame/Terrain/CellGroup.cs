@@ -4,19 +4,21 @@ namespace MyFramework
 {
     public sealed class CellGroup
     {
-        public const int CellCount = 10;
+        public const int DefaultCellCount = 10;
         public const int CellSize = 1;
 
-        Cell[,] m_cells;
+        Cell[,] _cells;
         public readonly CellGroupIndex MapIndex;
         public readonly Vector3 LeftBottomPosition;
+        public readonly int CellCount;
 
-        public CellGroup(int indexX, int indexY)
+        public CellGroup(int indexX, int indexY, int cellCount)
         {
             MapIndex = new CellGroupIndex(indexX, indexY);
             LeftBottomPosition = GetLeftBottomPos(indexX, indexY);
+            CellCount = cellCount;
 
-            m_cells = new Cell[CellCount, CellCount];
+            _cells = new Cell[CellCount, CellCount];
             Vector3 tempPos = new Vector3();
             float halfCellSize = CellSize * 0.5f;
             for(int y=0;y < CellCount; ++y)
@@ -26,7 +28,7 @@ namespace MyFramework
                     tempPos.x = LeftBottomPosition.x + (CellSize * x) + halfCellSize;
                     tempPos.y = 0f;
                     tempPos.z = LeftBottomPosition.z + (CellSize * y) + halfCellSize;
-                    m_cells[y, x] = new Cell()
+                    _cells[y, x] = new Cell()
                     {
                         CenterPosition = tempPos
                     };
@@ -34,11 +36,14 @@ namespace MyFramework
             }
         }
 
+        public CellGroup(int indexX, int indexY)
+            : this(indexX, indexY, DefaultCellCount) { }
+
         public Cell GetCell(int indexX,int indexY)
         {
             if (indexX < 0 || indexX >= CellCount) return null;
             if (indexY < 0 || indexY >= CellCount) return null;
-            return m_cells[indexY, indexX];
+            return _cells[indexY, indexX];
         }
 
         public Cell GetCell(Vector3 location)
@@ -52,19 +57,19 @@ namespace MyFramework
             return GetCell(indexX, indexY);
         }
 
-        public static Vector3 GetLeftBottomPos(int indexX,int indexY)
+        public static Vector3 GetLeftBottomPos(int indexX,int indexY, int cellCount = DefaultCellCount)
         {
             return new Vector3
                 (
-                indexX * GetSize(),
+                indexX * GetSize(cellCount),
                 0f,
-                indexY * GetSize()
+                indexY * GetSize(cellCount)
                 );
         }
 
-        public static float GetSize()
+        public static float GetSize(int cellCount = DefaultCellCount)
         {
-            return CellCount * CellSize;
+            return cellCount * CellSize;
         }
     }
 }
